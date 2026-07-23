@@ -229,17 +229,19 @@ public abstract class AbstractAdanosTask extends Task implements RunnableTask<Ab
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 
-    private HttpConfiguration httpConfiguration(RunContext runContext) throws IllegalVariableEvaluationException {
-        HttpConfiguration.HttpConfigurationBuilder configuration = HttpConfiguration.builder();
+    HttpConfiguration httpConfiguration(RunContext runContext) throws IllegalVariableEvaluationException {
+        var timeout = TimeoutConfiguration.builder();
         if (options != null) {
-            configuration.timeout(
-                TimeoutConfiguration.builder()
-                    .connectTimeout(renderedDuration(runContext, options.connectTimeout))
-                    .readIdleTimeout(renderedDuration(runContext, options.readIdleTimeout))
-                    .build()
-            );
+            Property<Duration> connectTimeout = renderedDuration(runContext, options.connectTimeout);
+            Property<Duration> readIdleTimeout = renderedDuration(runContext, options.readIdleTimeout);
+            if (connectTimeout != null) {
+                timeout.connectTimeout(connectTimeout);
+            }
+            if (readIdleTimeout != null) {
+                timeout.readIdleTimeout(readIdleTimeout);
+            }
         }
-        return configuration.build();
+        return HttpConfiguration.builder().timeout(timeout.build()).build();
     }
 
     private Property<Duration> renderedDuration(RunContext runContext, Property<Duration> property)

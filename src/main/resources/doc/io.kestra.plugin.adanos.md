@@ -18,8 +18,6 @@ tasks:
       - TSLA
       - NVDA
       - AMD
-    from: 2026-07-01
-    to: 2026-07-07
 ```
 
 Use `fetchType: STORE` for list responses that should be written to Kestra internal storage. Crypto requests currently require `assetType: CRYPTO` and `source: REDDIT`; other combinations are rejected before a network call.

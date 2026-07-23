@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,17 @@ class AdanosTaskTest extends AbstractAdanosTest {
 
     @Inject
     private StorageInterface storageInterface;
+
+    @Test
+    void appliesDefaultReadIdleTimeout() throws Exception {
+        var task = GetMarketSentiment.builder().build();
+        var runContext = runContextFactory.of();
+
+        var timeout = task.httpConfiguration(runContext).getTimeout();
+        var readIdleTimeout = runContext.render(timeout.getReadIdleTimeout()).as(Duration.class).orElseThrow();
+
+        assertThat(readIdleTimeout, is(Duration.ofMinutes(5)));
+    }
 
     @Test
     void getsStockSentimentWithAuthenticationAndDates() throws Exception {

@@ -38,8 +38,6 @@ import lombok.experimental.SuperBuilder;
                     assetType: STOCK
                     source: REDDIT
                     symbol: TSLA
-                    from: 2026-07-01
-                    to: 2026-07-07
                 """
         ),
         @Example(

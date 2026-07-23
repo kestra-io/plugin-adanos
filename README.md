@@ -39,8 +39,6 @@ tasks:
     assetType: STOCK
     source: REDDIT
     symbol: TSLA
-    from: 2026-07-01
-    to: 2026-07-07
 ```
 
 Stock tasks support `REDDIT`, `X`, `NEWS`, and `POLYMARKET`. Crypto tasks currently support `REDDIT`. Unsupported combinations fail before an HTTP request is made.
