@@ -5,6 +5,7 @@ import io.kestra.core.models.tasks.common.FetchType;
 import io.kestra.core.http.client.HttpClientResponseException;
 import io.kestra.core.runners.RunContextFactory;
 import io.kestra.core.serializers.FileSerde;
+import io.kestra.core.serializers.JacksonMapper;
 import io.kestra.core.storages.StorageInterface;
 import io.kestra.core.tenant.TenantService;
 import jakarta.inject.Inject;
@@ -40,6 +41,27 @@ class AdanosTaskTest extends AbstractAdanosTest {
         var readIdleTimeout = runContext.render(timeout.getReadIdleTimeout()).as(Duration.class).orElseThrow();
 
         assertThat(readIdleTimeout, is(Duration.ofMinutes(5)));
+    }
+
+    @Test
+    void deserializesRequestOptionsFromYaml() throws Exception {
+        var options = JacksonMapper.ofYaml().readValue(
+            """
+                connectTimeout: PT10S
+                readIdleTimeout: PT30S
+                """,
+            AbstractAdanosTask.RequestOptions.class
+        );
+
+        var runContext = runContextFactory.of();
+        assertThat(
+            runContext.render(options.getConnectTimeout()).as(Duration.class).orElseThrow(),
+            is(Duration.ofSeconds(10))
+        );
+        assertThat(
+            runContext.render(options.getReadIdleTimeout()).as(Duration.class).orElseThrow(),
+            is(Duration.ofSeconds(30))
+        );
     }
 
     @Test
@@ -131,6 +153,21 @@ class AdanosTaskTest extends AbstractAdanosTest {
         assertThat(FakeAdanosController.lastPath(), is("/reddit/crypto/v1/compare"));
         assertThat(FakeAdanosController.queryParameters().get("symbols"), is("BTC,ETH"));
         assertThat(output.getSize(), is(1));
+    }
+
+    @Test
+    void rejectsMoreThanTenDistinctCompareSymbolsBeforeRequest() {
+        var task = CompareAssets.builder()
+            .baseUrl(Property.ofValue(embeddedServer.getURI() + "/api"))
+            .apiKey(Property.ofValue("test-api-key"))
+            .symbols(Property.ofValue(List.of(
+                "AAPL", "AMD", "AMZN", "GOOG", "META", "MSFT", "NFLX", "NVDA", "TSLA", "TSM", "ORCL"
+            )))
+            .build();
+
+        var error = assertThrows(IllegalArgumentException.class, () -> task.run(runContextFactory.of()));
+        assertThat(error.getMessage(), containsString("no more than ten"));
+        assertThat(FakeAdanosController.lastPath(), is((String) null));
     }
 
     @Test

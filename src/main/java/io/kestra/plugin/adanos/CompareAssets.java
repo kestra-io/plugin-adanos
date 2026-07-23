@@ -14,6 +14,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 @SuperBuilder
@@ -51,7 +52,7 @@ import java.util.Objects;
 public class CompareAssets extends AbstractAdanosTask {
     @Schema(
         title = "Tickers or symbols",
-        description = "At least two stock tickers or crypto symbols to compare."
+        description = "Between 2 and 10 distinct stock tickers or crypto symbols to compare."
     )
     @NotNull
     @PluginProperty(group = "main")
@@ -70,9 +71,16 @@ public class CompareAssets extends AbstractAdanosTask {
             .filter(Objects::nonNull)
             .map(String::trim)
             .filter(value -> !value.isBlank())
+            .map(value -> value.startsWith("$") ? value.substring(1) : value)
+            .map(value -> value.toUpperCase(Locale.ROOT))
+            .filter(value -> !value.isBlank())
+            .distinct()
             .toList();
         if (normalized.size() < 2) {
-            throw new IllegalArgumentException("`symbols` must contain at least two values.");
+            throw new IllegalArgumentException("`symbols` must contain at least two distinct values.");
+        }
+        if (normalized.size() > 10) {
+            throw new IllegalArgumentException("`symbols` must contain no more than ten distinct values.");
         }
 
         String parameter = context.assetType() == AssetType.CRYPTO ? "symbols" : "tickers";
