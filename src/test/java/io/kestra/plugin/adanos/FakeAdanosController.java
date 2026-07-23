@@ -46,6 +46,9 @@ public class FakeAdanosController {
                 {"detail":{"error":"rate_limit_exceeded","message":"Monthly request limit reached."}}
                 """);
         }
+        if (symbol.equals("EMPTY")) {
+            return HttpResponse.ok("");
+        }
         return HttpResponse.ok("""
             {"ticker":"%s","found":true,"buzz_score":82.4,"sentiment_score":0.31,"mentions":125}
             """.formatted(symbol));

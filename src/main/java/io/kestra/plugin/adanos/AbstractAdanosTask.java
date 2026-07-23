@@ -45,6 +45,7 @@ import java.util.Map;
 @NoArgsConstructor
 public abstract class AbstractAdanosTask extends Task implements RunnableTask<AbstractAdanosTask.Output> {
     private static final String DEFAULT_BASE_URL = "https://api.adanos.org";
+    private static final int MAX_RESPONSE_BYTES = 10 * 1024 * 1024;
 
     @Schema(
         title = "Adanos API key",
@@ -115,7 +116,12 @@ public abstract class AbstractAdanosTask extends Task implements RunnableTask<Ab
 
         try (HttpClient client = new HttpClient(runContext, httpConfiguration(runContext))) {
             HttpResponse<String> response = client.request(request, String.class);
-            Object body = JacksonMapper.ofJson().readValue(response.getBody(), new TypeReference<>() {});
+            String responseBody = response.getBody();
+            if (responseBody == null || responseBody.isBlank()) {
+                throw new IllegalStateException("Adanos returned an empty response body for endpoint `" + path + "`.");
+            }
+
+            Object body = JacksonMapper.ofJson().readValue(responseBody, new TypeReference<>() {});
             return handleFetch(runContext, body, rFetchType);
         }
     }
@@ -241,7 +247,10 @@ public abstract class AbstractAdanosTask extends Task implements RunnableTask<Ab
                 timeout.readIdleTimeout(readIdleTimeout);
             }
         }
-        return HttpConfiguration.builder().timeout(timeout.build()).build();
+        return HttpConfiguration.builder()
+            .timeout(timeout.build())
+            .maxContentLength(MAX_RESPONSE_BYTES)
+            .build();
     }
 
     private Property<Duration> renderedDuration(RunContext runContext, Property<Duration> property)

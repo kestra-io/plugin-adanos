@@ -6,6 +6,8 @@ import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -47,12 +49,12 @@ public class ListTrendingAssets extends AbstractAdanosTask {
     @Schema(title = "Maximum results", description = "Maximum number of assets to return, from 1 to 100.")
     @Builder.Default
     @PluginProperty(group = "processing")
-    private Property<Integer> limit = Property.ofValue(20);
+    private Property<@Min(1) @Max(100) Integer> limit = Property.ofValue(20);
 
     @Schema(title = "Pagination offset", description = "Number of matching assets to skip before returning results.")
     @Builder.Default
     @PluginProperty(group = "processing")
-    private Property<Integer> offset = Property.ofValue(0);
+    private Property<@Min(0) Integer> offset = Property.ofValue(0);
 
     @Schema(
         title = "Stock asset filter",

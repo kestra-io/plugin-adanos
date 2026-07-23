@@ -37,10 +37,12 @@ class AdanosTaskTest extends AbstractAdanosTest {
         var task = GetMarketSentiment.builder().build();
         var runContext = runContextFactory.of();
 
-        var timeout = task.httpConfiguration(runContext).getTimeout();
+        var configuration = task.httpConfiguration(runContext);
+        var timeout = configuration.getTimeout();
         var readIdleTimeout = runContext.render(timeout.getReadIdleTimeout()).as(Duration.class).orElseThrow();
 
         assertThat(readIdleTimeout, is(Duration.ofMinutes(5)));
+        assertThat(configuration.getMaxContentLength(), is(10 * 1024 * 1024));
     }
 
     @Test
@@ -295,5 +297,18 @@ class AdanosTaskTest extends AbstractAdanosTest {
         var error = assertThrows(HttpClientResponseException.class, () -> task.run(runContextFactory.of()));
         assertThat(error.getMessage(), containsString("response code '429'"));
         assertThat(error.getMessage(), containsString("Monthly request limit reached"));
+    }
+
+    @Test
+    void rejectsEmptySuccessfulResponseWithEndpointContext() {
+        var task = GetAssetSentiment.builder()
+            .baseUrl(Property.ofValue(embeddedServer.getURI() + "/api"))
+            .apiKey(Property.ofValue("test-api-key"))
+            .symbol(Property.ofValue("EMPTY"))
+            .build();
+
+        var error = assertThrows(IllegalStateException.class, () -> task.run(runContextFactory.of()));
+        assertThat(error.getMessage(), containsString("empty response body"));
+        assertThat(error.getMessage(), containsString("/reddit/stocks/v1/stock/EMPTY"));
     }
 }

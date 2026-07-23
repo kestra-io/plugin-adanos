@@ -10,4 +10,4 @@ kestra:
 
 micronaut:
   server:
-    port: 59444
+    port: -1
