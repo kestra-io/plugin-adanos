@@ -1,16 +1,27 @@
-This is the Kestra plugin template. Use it as a starting point for building a new plugin.
+Use the Adanos plugin to add market sentiment and attention data to Kestra flows.
 
-## What this template ships
+Adanos combines Reddit, X / FinTwit, financial news, and Polymarket signals for stocks. Reddit crypto sentiment is also available. The plugin provides four read-only tasks for individual assets, trending assets, comparisons, and market-level sentiment.
 
-- `Example` is a sample `RunnableTask` that reverses an input string.
-- `Trigger` is a sample polling trigger that fires an execution at random.
+Create an API key at [adanos.org/register](https://adanos.org/register), save it as a Kestra secret, and reference it with `{{ secret('ADANOS_API_KEY') }}`. The key is sent in the `X-API-Key` header and is not logged.
 
-## How to build your plugin
+```yaml
+id: adanos_market_research
+namespace: company.research
 
-1. Rename the package `io.kestra.plugin.adanos` to your own, for example `io.kestra.plugin.myservice`.
-2. Update `group`, `name`, `title`, and `description` in `src/main/resources/metadata/index.yaml`.
-3. Replace `src/main/resources/icons/plugin-icon.svg` with your service's icon.
-4. Replace the `Example` and `Trigger` classes with your real tasks and triggers.
-5. Replace this how-to with documentation for your plugin.
+tasks:
+  - id: compare_stocks
+    type: io.kestra.plugin.adanos.CompareAssets
+    apiKey: "{{ secret('ADANOS_API_KEY') }}"
+    assetType: STOCK
+    source: NEWS
+    symbols:
+      - TSLA
+      - NVDA
+      - AMD
+    from: 2026-07-01
+    to: 2026-07-07
+```
 
-Run `./gradlew lintPluginDocs` before pushing to validate the plugin documentation.
+Use `fetchType: STORE` for list responses that should be written to Kestra internal storage. Crypto requests currently require `assetType: CRYPTO` and `source: REDDIT`; other combinations are rejected before a network call.
+
+The plugin uses the API's `from` and `to` date parameters and does not expose the deprecated `days` shorthand. Current endpoint details and plan limits are documented at [api.adanos.org/docs](https://api.adanos.org/docs).

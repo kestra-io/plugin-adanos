@@ -1,0 +1,26 @@
+id: adanos
+namespace: io.kestra.tests
+
+inputs:
+  - id: baseUrl
+    type: STRING
+    defaults: "http://localhost:59444/api"
+
+tasks:
+  - id: stock_sentiment
+    type: io.kestra.plugin.adanos.GetAssetSentiment
+    baseUrl: "{{ inputs.baseUrl }}"
+    apiKey: "test-api-key"
+    assetType: STOCK
+    source: REDDIT
+    symbol: TSLA
+    from: 2026-07-01
+    to: 2026-07-07
+
+  - id: crypto_trending
+    type: io.kestra.plugin.adanos.ListTrendingAssets
+    baseUrl: "{{ inputs.baseUrl }}"
+    apiKey: "test-api-key"
+    assetType: CRYPTO
+    source: REDDIT
+    limit: 10
