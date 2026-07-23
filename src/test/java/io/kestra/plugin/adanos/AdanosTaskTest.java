@@ -105,6 +105,23 @@ class AdanosTaskTest extends AbstractAdanosTest {
     }
 
     @Test
+    void comparesCryptoSymbols() throws Exception {
+        var task = CompareAssets.builder()
+            .baseUrl(Property.ofValue(embeddedServer.getURI() + "/api"))
+            .apiKey(Property.ofValue("test-api-key"))
+            .assetType(Property.ofValue(AbstractAdanosTask.AssetType.CRYPTO))
+            .source(Property.ofValue(AbstractAdanosTask.Source.REDDIT))
+            .symbols(Property.ofValue(List.of("BTC", "ETH")))
+            .build();
+
+        var output = task.run(runContextFactory.of());
+
+        assertThat(FakeAdanosController.lastPath(), is("/reddit/crypto/v1/compare"));
+        assertThat(FakeAdanosController.queryParameters().get("symbols"), is("BTC,ETH"));
+        assertThat(output.getSize(), is(1));
+    }
+
+    @Test
     void getsPolymarketMarketSentiment() throws Exception {
         var task = GetMarketSentiment.builder()
             .baseUrl(Property.ofValue(embeddedServer.getURI() + "/api"))

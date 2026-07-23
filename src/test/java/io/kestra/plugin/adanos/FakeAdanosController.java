@@ -89,6 +89,14 @@ public class FakeAdanosController {
             """);
     }
 
+    @Get("/reddit/crypto/v1/compare")
+    public HttpResponse<String> cryptoCompare(HttpRequest<?> request) {
+        capture(request, "/reddit/crypto/v1/compare");
+        return HttpResponse.ok("""
+            {"symbols":["BTC","ETH"],"winner":"BTC"}
+            """);
+    }
+
     @Get("/polymarket/stocks/v1/market-sentiment")
     public HttpResponse<String> polymarketMarket(HttpRequest<?> request) {
         capture(request, "/polymarket/stocks/v1/market-sentiment");
