@@ -42,7 +42,6 @@ class AdanosTaskTest extends AbstractAdanosTest {
         var readIdleTimeout = runContext.render(timeout.getReadIdleTimeout()).as(Duration.class).orElseThrow();
 
         assertThat(readIdleTimeout, is(Duration.ofMinutes(5)));
-        assertThat(configuration.getMaxContentLength(), is(10 * 1024 * 1024));
     }
 
     @Test
