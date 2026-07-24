@@ -2,14 +2,14 @@
 
 ## What
 
-- Provides plugin components under `io.kestra.plugin.adanos`.
-- Includes classes such as `Example`, `Trigger`.
+- Provides read-only Adanos market sentiment tasks under `io.kestra.plugin.adanos`.
+- Includes asset sentiment, trending, comparison, and market-level tasks.
 
 ## Why
 
-- What user problem does this solve? Teams need a concrete starting point for building and validating new Kestra plugins without recreating the same project scaffolding from scratch.
-- Why would a team adopt this plugin in a workflow? It gives plugin authors a ready-made reference repo they can adapt alongside their own build, test, and publishing workflow.
-- What operational/business outcome does it enable? It shortens plugin delivery time, reduces setup mistakes, and makes internal or partner plugin development more repeatable.
+- What user problem does this solve? Kestra workflows otherwise need hand-built HTTP requests and response handling for market sentiment data.
+- Why would a team adopt this plugin in a workflow? It provides typed, secret-safe tasks for stocks and crypto with Kestra-native fetch and storage modes.
+- What operational/business outcome does it enable? Teams can schedule sentiment snapshots and feed structured alternative data into alerts, reports, and research pipelines.
 
 ## How
 
@@ -25,7 +25,10 @@ Infrastructure dependencies (Docker Compose services):
 
 ### Key Plugin Classes
 
-- `io.kestra.plugin.adanos.Example`
+- `io.kestra.plugin.adanos.GetAssetSentiment`
+- `io.kestra.plugin.adanos.ListTrendingAssets`
+- `io.kestra.plugin.adanos.CompareAssets`
+- `io.kestra.plugin.adanos.GetMarketSentiment`
 
 ### Project Structure
 
