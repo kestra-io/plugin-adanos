@@ -45,7 +45,6 @@ import java.util.Map;
 @NoArgsConstructor
 public abstract class AbstractAdanosTask extends Task implements RunnableTask<AbstractAdanosTask.Output> {
     private static final String DEFAULT_BASE_URL = "https://api.adanos.org";
-    private static final int MAX_RESPONSE_BYTES = 10 * 1024 * 1024;
 
     @Schema(
         title = "Adanos API key",
@@ -249,7 +248,6 @@ public abstract class AbstractAdanosTask extends Task implements RunnableTask<Ab
         }
         return HttpConfiguration.builder()
             .timeout(timeout.build())
-            .maxContentLength(MAX_RESPONSE_BYTES)
             .build();
     }
 
