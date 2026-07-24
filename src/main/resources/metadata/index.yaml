@@ -1,8 +1,13 @@
 group: io.kestra.plugin.adanos
 name: "adanos"
 title: "Adanos"
-description: "Adanos plugin for Kestra"
-body: ""
+description: "Stock and crypto market sentiment data from Reddit, X / FinTwit, financial news, and Polymarket"
+body: |
+  Adanos tasks add read-only market sentiment and attention data to Kestra workflows.
+
+  The plugin can retrieve one asset, list trending assets, compare assets, and return aggregate market sentiment. Stock data is available from Reddit, X / FinTwit, financial news, and Polymarket; crypto data currently uses Reddit.
+
+  Use `{{ secret('ADANOS_API_KEY') }}` for the `apiKey` property. Every task supports Kestra fetch and internal-storage result handling.
 videos: []
-createdBy: "Kestra Core Team"
+createdBy: "Adanos"
 managedBy: "Kestra Core Team"
